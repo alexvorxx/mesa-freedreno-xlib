@@ -2,25 +2,26 @@
 ======================================================
 
 
+Build Mesa Freedreno
+---------------
+
+Build Mesa Freedreno using this repository (https://github.com/alexvorxx/mesa-freedreno-xlib).
+
+Go to the folder with Mesa code and run the commands:
+
+  $ meson build -D platforms=x11 -D vulkan-drivers= -D libunwind=disabled -D shared-glapi=enabled -D microsoft-clc=disabled -D valgrind=disabled --prefix /usr -D gles1=disabled -D freedreno-kmds=kgsl -D gallium-drivers=freedreno -D llvm=disabled -D shared-llvm=disabled -D glx=xlib -D buildtype=release
+
+  $ ninja -C build install
+
+======================================================
+
+
 Source
 ------
 
 This repository lives at https://gitlab.freedesktop.org/mesa/mesa.
 Other repositories are likely forks, and code found there is not supported.
 
-
-Build & install
----------------
-
-You can find more information in our documentation (`docs/install.rst
-<https://docs.mesa3d.org/install.html>`_), but the recommended way is to use
-Meson (`docs/meson.rst <https://docs.mesa3d.org/meson.html>`_):
-
-.. code-block:: sh
-
-  $ meson setup build
-  $ ninja -C build/
-  $ sudo ninja -C build/ install
 
 Support
 -------
