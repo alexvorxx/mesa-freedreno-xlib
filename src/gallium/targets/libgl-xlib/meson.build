@@ -17,7 +17,7 @@ libgl = shared_library(
   'GL',
   files('xlib.c'),
   include_directories : [
-    inc_include, inc_src, inc_mesa, inc_gallium, inc_gallium_aux, inc_gallium_winsys, inc_gallium_drivers,
+    inc_include, inc_src, inc_mesa, inc_gallium, inc_gallium_aux, inc_gallium_winsys, inc_gallium_drivers, inc_freedreno,
     include_directories('../../frontends/glx/xlib'),
   ],
   gnu_symbol_visibility : 'hidden',
@@ -25,7 +25,7 @@ libgl = shared_library(
   link_depends : gallium_xlib_link_depends,
   link_whole : [libxlib, libglapi_bridge],
   link_with : [libgalliumvl_stub, libws_xlib, libglapi, libgallium, libmesa],
-  dependencies : [dep_x11, idep_mesautil, dep_thread, dep_clock, dep_unwind, driver_swrast, driver_virgl, driver_asahi],
+  dependencies : [dep_x11, idep_mesautil, dep_thread, dep_clock, dep_unwind, driver_swrast, driver_virgl, driver_asahi, driver_freedreno],
   install : true,
   version : '1.5.0',
   darwin_versions: '4.0.0',

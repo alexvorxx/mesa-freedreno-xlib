@@ -23,6 +23,8 @@
 #include "freedreno_tracepoints.h"
 #include "util/u_trace_gallium.h"
 
+struct pipe_context* freedreno_xlib_context;
+
 static void
 fd_context_flush(struct pipe_context *pctx, struct pipe_fence_handle **fencep,
                  unsigned flags) in_dt
@@ -749,6 +751,8 @@ fd_context_init(struct fd_context *ctx, struct pipe_screen *pscreen,
 
    fd_autotune_init(&ctx->autotune, screen->dev);
 
+   freedreno_xlib_context = pctx;
+
    return pctx;
 
 fail:
@@ -784,6 +788,8 @@ fd_context_init_tc(struct pipe_context *pctx, unsigned flags)
       ((struct threaded_context *)tc)->bytes_replaced_limit =
          ((struct threaded_context *)tc)->bytes_mapped_limit / 4;
    }
+
+   freedreno_xlib_context = tc;
 
    return tc;
 }

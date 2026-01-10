@@ -34,6 +34,11 @@
 
 #include "state_tracker/st_context.h"
 
+typedef unsigned char      ubyte;
+
+extern struct pipe_context* freedreno_xlib_context;
+extern struct sw_winsys *freedreno_winsys;
+
 struct xmesa_st_framebuffer {
    struct pipe_frontend_drawable base;
 
@@ -57,6 +62,40 @@ xmesa_st_framebuffer(struct pipe_frontend_drawable *drawable)
    return (struct xmesa_st_framebuffer *)drawable;
 }
 
+static void
+freedreno_flush_frontbuffer(struct pipe_screen *pscreen,
+                            struct pipe_context *pctx,
+                            struct pipe_resource *pres,
+                            unsigned level, unsigned layer,
+                            void *winsys_drawable_handle,
+                            unsigned nboxes,
+                            struct pipe_box *sub_box)
+{
+    pctx = freedreno_xlib_context;
+    struct sw_winsys *winsys = freedreno_winsys;
+
+    if (!winsys)
+        return;
+    void *map = winsys->displaytarget_map(winsys, pres->dt1, 0);
+
+    if (map) {
+        struct pipe_transfer *transfer = NULL;
+
+        void *res_map = pipe_texture_map(pctx, pres, level, layer, PIPE_MAP_READ, 0, 0,
+                                         u_minify(pres->width0, level),
+                                         u_minify(pres->height0, level),
+                                         &transfer);
+        if (res_map) {
+            util_copy_rect((ubyte*)map, pres->format, pres->dt_stride, 0, 0,
+                           transfer->box.width, transfer->box.height,
+                           (const ubyte*)res_map, transfer->stride, 0, 0);
+            pipe_texture_unmap(pctx, transfer);
+        }
+        winsys->displaytarget_unmap(winsys, pres->dt1);
+    }
+
+    winsys->displaytarget_display(winsys, pres->dt1, winsys_drawable_handle, nboxes, sub_box);
+}
 
 /**
  * Display (present) an attachment to the xlib_drawable of the framebuffer.
@@ -83,7 +122,8 @@ xmesa_st_framebuffer_display(struct pipe_frontend_drawable *drawable,
       pres = xstfb->display_resource;
    }
 
-   xstfb->screen->flush_frontbuffer(xstfb->screen, pctx, pres, 0, 0, &xstfb->buffer->ws, nboxes, box);
+   //xstfb->screen->flush_frontbuffer(xstfb->screen, pctx, pres, 0, 0, &xstfb->buffer->ws, nboxes, box);
+   freedreno_flush_frontbuffer(xstfb->screen, pctx, pres, 0, 0, &xstfb->buffer->ws, nboxes, box);
    return true;
 }
 

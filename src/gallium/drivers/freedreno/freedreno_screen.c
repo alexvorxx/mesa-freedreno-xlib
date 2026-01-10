@@ -973,17 +973,17 @@ fd_screen_create(int fd,
    screen->has_syncobj = fd_has_syncobj(screen->dev);
 
    /* parse driconf configuration now for device specific overrides: */
-   driParseConfigFiles(config->options, config->options_info, 0, "msm",
-                       NULL, fd_dev_name(screen->dev_id), NULL, 0, NULL, 0);
+   //driParseConfigFiles(config->options, config->options_info, 0, "msm",
+   //                    NULL, fd_dev_name(screen->dev_id), NULL, 0, NULL, 0);
 
-   screen->driconf.conservative_lrz =
-         !driQueryOptionb(config->options, "disable_conservative_lrz");
-   screen->driconf.enable_throttling =
-         !driQueryOptionb(config->options, "disable_throttling");
-   screen->driconf.dual_color_blend_by_location =
-         driQueryOptionb(config->options, "dual_color_blend_by_location");
-   if (driQueryOptionb(config->options, "disable_explicit_sync_heuristic"))
-      fd_device_disable_explicit_sync_heuristic(dev);
+   screen->driconf.conservative_lrz = false;
+         //!driQueryOptionb(config->options, "disable_conservative_lrz");
+   screen->driconf.enable_throttling = false;
+         //!driQueryOptionb(config->options, "disable_throttling");
+   screen->driconf.dual_color_blend_by_location = true;
+         //driQueryOptionb(config->options, "dual_color_blend_by_location");
+   //if (driQueryOptionb(config->options, "disable_explicit_sync_heuristic"))
+      //fd_device_disable_explicit_sync_heuristic(dev);
 
    struct sysinfo si;
    sysinfo(&si);

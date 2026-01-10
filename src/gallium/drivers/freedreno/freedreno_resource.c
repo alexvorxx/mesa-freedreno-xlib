@@ -36,6 +36,9 @@
 /* XXX this should go away, needed for 'struct winsys_handle' */
 #include "frontend/drm_driver.h"
 
+#include "frontend/sw_winsys.h"
+extern struct sw_winsys *freedreno_winsys;
+
 /**
  * Go through the entire state and see if the resource is bound
  * anywhere. If it is, mark the relevant state as dirty. This is
@@ -1467,6 +1470,16 @@ fd_resource_create_with_modifiers(struct pipe_screen *pscreen,
    if (!prsc)
       return NULL;
    rsc = fd_resource(prsc);
+
+   if (freedreno_winsys && (tmpl->bind & PIPE_BIND_DISPLAY_TARGET)) {
+        prsc->dt1 = freedreno_winsys->displaytarget_create(freedreno_winsys,
+                                                           prsc->bind,
+                                                           prsc->format,
+                                                           tmpl->width0,
+                                                           tmpl->height0,
+                                                           64, NULL,
+                                                           &prsc->dt_stride);
+   }
 
    realloc_bo(rsc, size);
    if (!rsc->bo)

@@ -11,6 +11,7 @@
 
 #include "pipe/p_state.h"
 #include "util/list.h"
+#include "util/u_inlines.h"
 
 #include "freedreno_util.h"
 

@@ -592,6 +592,9 @@ struct pipe_resource
     * screen::get_driver_pipe_screen instead if it's non-NULL.
     */
    struct pipe_screen *screen; /**< screen that this texture belongs to */
+
+    struct sw_displaytarget *dt1;
+    unsigned dt_stride;
 };
 
 /**
