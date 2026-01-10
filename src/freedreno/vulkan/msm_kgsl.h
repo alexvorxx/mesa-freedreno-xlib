@@ -4,6 +4,8 @@
  * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
+#define __user
+
 #ifndef _UAPI_MSM_KGSL_H
 #define _UAPI_MSM_KGSL_H
 
