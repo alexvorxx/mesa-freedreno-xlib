@@ -1418,6 +1418,16 @@ fd_resource_allocate_and_resolve(struct pipe_screen *pscreen,
    if (psize)
       *psize = size;
 
+   if (freedreno_winsys && (tmpl->bind & PIPE_BIND_DISPLAY_TARGET)) {
+      prsc->dt1 = freedreno_winsys->displaytarget_create(freedreno_winsys,
+                                                           prsc->bind,
+                                                           prsc->format,
+                                                           tmpl->width0,
+                                                           tmpl->height0,
+                                                           64, NULL,
+                                                           &prsc->dt_stride);
+  }
+
    return prsc;
 }
 
@@ -1438,15 +1448,16 @@ fd_resource_create_with_modifiers(struct pipe_screen *pscreen,
     * create_with_modifiers() doesn't give us usage flags, so we have to
     * assume that all calls with modifiers are scanout-possible
     */
-   if (screen->ro &&
-       ((tmpl->bind & PIPE_BIND_SCANOUT) ||
-        has_explicit_modifier(modifiers, count))) {
-      struct pipe_resource scanout_templat = *tmpl;
-      struct renderonly_scanout *scanout;
-      struct winsys_handle handle;
 
-      /* note: alignment is wrong for a6xx */
-      scanout_templat.width0 = align(tmpl->width0, screen->info->gmem_align_w);
+    /* if (screen->ro &&
+         ((tmpl->bind & PIPE_BIND_SCANOUT) ||
+          has_explicit_modifier(modifiers, count))) {
+        struct pipe_resource scanout_templat = *tmpl;
+        struct renderonly_scanout *scanout;
+        struct winsys_handle handle;
+
+        /* note: alignment is wrong for a6xx */
+      /*scanout_templat.width0 = align(tmpl->width0, screen->info->gmem_align_w);
 
       scanout =
          renderonly_scanout_for_resource(&scanout_templat, screen->ro, &handle);
@@ -1463,23 +1474,13 @@ fd_resource_create_with_modifiers(struct pipe_screen *pscreen,
          return NULL;
 
       return &rsc->b.b;
-   }
+   }*/
 
    prsc =
       fd_resource_allocate_and_resolve(pscreen, tmpl, modifiers, count, &size);
    if (!prsc)
       return NULL;
    rsc = fd_resource(prsc);
-
-   if (freedreno_winsys && (tmpl->bind & PIPE_BIND_DISPLAY_TARGET)) {
-        prsc->dt1 = freedreno_winsys->displaytarget_create(freedreno_winsys,
-                                                           prsc->bind,
-                                                           prsc->format,
-                                                           tmpl->width0,
-                                                           tmpl->height0,
-                                                           64, NULL,
-                                                           &prsc->dt_stride);
-   }
 
    realloc_bo(rsc, size);
    if (!rsc->bo)
@@ -1560,6 +1561,16 @@ fd_resource_from_handle(struct pipe_screen *pscreen,
 
    if (FD_DBG(LAYOUT))
       fdl_dump_layout(&rsc->layout);
+
+   if (freedreno_winsys && (tmpl->bind & PIPE_BIND_DISPLAY_TARGET)) {
+      prsc->dt1 = freedreno_winsys->displaytarget_create(freedreno_winsys,
+                                                           prsc->bind,
+                                                           prsc->format,
+                                                           tmpl->width0,
+                                                           tmpl->height0,
+                                                           64, NULL,
+                                                           &prsc->dt_stride);
+   }
 
    return prsc;
 
